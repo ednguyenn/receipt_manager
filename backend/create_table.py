@@ -1,20 +1,20 @@
-# create_table.py
+# backend/create_table.py
 
 import boto3
-import botocore.exceptions
 import os
+from botocore.exceptions import ClientError
 
-def create_receipts_table(table_name='ReceiptsTable'):
-    """
-    Creates a DynamoDB table for storing receipt data.
-    """
-    # Initialize DynamoDB resource
+# DynamoDB table name
+DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', 'ReceiptsTable')
+
+def create_receipts_table():
+    """Create a DynamoDB table for storing receipt data."""
     dynamodb = boto3.resource('dynamodb')
 
-    # Define the table schema
     try:
+        # Define the table schema
         table = dynamodb.create_table(
-            TableName=table_name,
+            TableName=DYNAMODB_TABLE,
             KeySchema=[
                 {
                     'AttributeName': 'user_id',
@@ -28,23 +28,19 @@ def create_receipts_table(table_name='ReceiptsTable'):
             AttributeDefinitions=[
                 {
                     'AttributeName': 'user_id',
-                    'AttributeType': 'S'
+                    'AttributeType': 'S'  # String type
                 },
                 {
                     'AttributeName': 'receipt_id',
-                    'AttributeType': 'S'
+                    'AttributeType': 'S'  # String type
                 },
                 {
                     'AttributeName': 'vendor_name',
-                    'AttributeType': 'S'
+                    'AttributeType': 'S'  # String type for querying by vendor name
                 },
                 {
                     'AttributeName': 'transaction_date',
-                    'AttributeType': 'S'
-                },
-                {
-                    'AttributeName': 'total_amount',
-                    'AttributeType': 'N'
+                    'AttributeType': 'S'  # String type for querying by date
                 }
             ],
             ProvisionedThroughput={
@@ -95,16 +91,15 @@ def create_receipts_table(table_name='ReceiptsTable'):
             ]
         )
 
-        print(f"Creating table '{table_name}'...")
-        # Wait until the table exists
-        table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
-        print(f"Table '{table_name}' created successfully.")
+        print(f"Creating table '{DYNAMODB_TABLE}'...")
+        table.meta.client.get_waiter('table_exists').wait(TableName=DYNAMODB_TABLE)
+        print(f"Table '{DYNAMODB_TABLE}' created successfully.")
 
-    except botocore.exceptions.ClientError as e:
+    except ClientError as e:
         if e.response['Error']['Code'] == 'ResourceInUseException':
-            print(f"Table '{table_name}' already exists.")
+            print(f"Table '{DYNAMODB_TABLE}' already exists.")
         else:
-            print(f"Unexpected error: {e}")
+            print(f"Error creating table: {e}")
             raise
 
 if __name__ == '__main__':

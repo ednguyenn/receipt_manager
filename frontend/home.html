@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Management App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Receipt Management App</h1>
+
+        <!-- Login Form -->
+        <div id="login-section">
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="text" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <!-- Upload Receipt Form (only visible after login) -->
+        <div id="upload-section" style="display: none;">
+            <h2>Upload Receipt</h2>
+            <form id="upload-form">
+                <input type="file" id="file-input" accept="image/*" required>
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+
+        <!-- Search Receipt Form (only visible after login) -->
+        <div id="search-section" style="display: none;">
+            <h2>Search Receipts</h2>
+            <form id="search-form">
+                <input type="text" id="search-query" placeholder="e.g., Woolworths receipts from early September" required>
+                <button type="submit">Search</button>
+            </form>
+
+            <!-- Search Results -->
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
