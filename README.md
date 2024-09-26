@@ -1,3 +1,4 @@
+```
 receipt-manager/
 │
 ├── frontend/
@@ -29,3 +30,4 @@ receipt-manager/
 │   └── test_list_function.py     # Unit tests for the list_receipts Lambda function
 │
 └── README.md                     # Instructions for setting up and running the project
+```
