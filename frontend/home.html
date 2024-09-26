@@ -1,47 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt Management App</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Receipt Manager</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Receipt Management App</h1>
+    <h1>Receipt Manager</h1>
+    <form id="uploadForm">
+        <label>Merchant: </label><input type="text" id="merchant"><br>
+        <label>Date: </label><input type="date" id="receiptDate"><br>
+        <label>Amount: </label><input type="number" id="amount"><br>
+        <button type="submit">Upload Receipt</button>
+    </form>
 
-        <!-- Login Form -->
-        <div id="login-section">
-            <h2>Login</h2>
-            <form id="login-form">
-                <input type="text" id="email" placeholder="Email" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
+    <hr>
 
-        <!-- Upload Receipt Form (only visible after login) -->
-        <div id="upload-section" style="display: none;">
-            <h2>Upload Receipt</h2>
-            <form id="upload-form">
-                <input type="file" id="file-input" accept="image/*" required>
-                <button type="submit">Upload</button>
-            </form>
-        </div>
+    <form id="searchForm">
+        <label>Search: </label><input type="text" id="query"><br>
+        <button type="submit">Search Receipt</button>
+    </form>
 
-        <!-- Search Receipt Form (only visible after login) -->
-        <div id="search-section" style="display: none;">
-            <h2>Search Receipts</h2>
-            <form id="search-form">
-                <input type="text" id="search-query" placeholder="e.g., Woolworths receipts from early September" required>
-                <button type="submit">Search</button>
-            </form>
+    <hr>
 
-            <!-- Search Results -->
-            <div id="results"></div>
-        </div>
-    </div>
+    <button id="listButton">List All Receipts</button>
+    <div id="results"></div>
 
-    <script src="app.js"></script>
+    <script>
+        // Implement JavaScript to call the API Gateway endpoints
+        document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            let response = await fetch('YOUR_API_GATEWAY_UPLOAD_ENDPOINT', {
+                method: 'POST',
+                body: JSON.stringify({
+                    merchant: document.getElementById('merchant').value,
+                    receipt_date: document.getElementById('receiptDate').value,
+                    amount: document.getElementById('amount').value
+                })
+            });
+            alert('Receipt uploaded successfully!');
+        });
+
+        document.getElementById('searchForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            let response = await fetch('YOUR_API_GATEWAY_SEARCH_ENDPOINT', {
+                method: 'POST',
+                body: JSON.stringify({
+                    query: document.getElementById('query').value
+                })
+            });
+            let results = await response.json();
+            document.getElementById('results').innerHTML = JSON.stringify(results);
+        });
+
+        document.getElementById('listButton').addEventListener('click', async function() {
+            let response = await fetch('YOUR_API_GATEWAY_LIST_ENDPOINT');
+            let results = await response.json();
+            document.getElementById('results').innerHTML = JSON.stringify(results);
+        });
+    </script>
 </body>
 </html>
