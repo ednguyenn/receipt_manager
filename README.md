@@ -1,78 +1,31 @@
-project-root/
+receipt-manager/
+│
 ├── frontend/
-│   ├── public/
-│   │   └── index.html
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Authentication/
-│   │   │   │   ├── Login.js
-│   │   │   │   ├── Signup.js
-│   │   │   │   └── Auth.css
-│   │   │   ├── ReceiptUpload/
-│   │   │   │   ├── UploadForm.js
-│   │   │   │   └── UploadForm.css
-│   │   │   ├── ReceiptSearch/
-│   │   │   │   ├── SearchBar.js
-│   │   │   │   └── SearchBar.css
-│   │   │   └── ReceiptDisplay/
-│   │   │       ├── ReceiptList.js
-│   │   │       └── ReceiptItem.js
-│   │   ├── assets/
-│   │   │   └── images/
-│   │   ├── App.js
-│   │   ├── index.js
-│   │   └── styles/
-│   │       └── main.css
-│   ├── package.json
-│   ├── package-lock.json
-│   └── .env
+│   ├── index.html          # Minimal frontend (HTML + JavaScript for interacting with APIs)
+│   ├── styles.css          # (Optional) Styling for the frontend (if needed)
+│   └── scripts.js          # JavaScript logic to interact with AWS API Gateway
+│
 ├── backend/
 │   ├── lambda_functions/
-│   │   ├── receipt_processor/
-│   │   │   ├── index.js
-│   │   │   ├── package.json
-│   │   │   └── node_modules/
-│   │   └── search_handler/
-│   │       ├── index.js
-│   │       ├── package.json
-│   │       └── node_modules/
-│   ├── config/
-│   │   └── awsConfig.js
-│   ├── package.json
-│   ├── package-lock.json
-│   └── .env
-├── infrastructure/
-│   ├── cloudformation/
-│   │   ├── s3_bucket.yaml
-│   │   ├── dynamodb_table.yaml
-│   │   ├── lambda_functions.yaml
-│   │   └── cognito_user_pool.yaml
-│   └── terraform/
-│       └── main.tf
-├── database/
-│   └── dynamodb/
-│       └── setup_scripts/
-│           └── create_table.js
-├── llm_api/
-│   ├── api_calls/
-│   │   ├── searchLLM.js
-│   │   └── llm_helpers.js
-│   ├── config/
-│   │   └── llmConfig.js
-│   └── package.json
-├── scripts/
-│   ├── deploy_frontend.sh
-│   ├── deploy_backend.sh
-│   └── setup_env.sh
+│   │   ├── upload_receipt/
+│   │   │   ├── app.py      # Lambda function to upload receipt to S3 and store metadata in DynamoDB
+│   │   │   └── requirements.txt  # Python dependencies (boto3, etc.)
+│   │   ├── search_receipt/
+│   │   │   ├── app.py      # Lambda function to search receipts using Bedrock and DynamoDB
+│   │   │   └── requirements.txt  # Python dependencies
+│   │   ├── list_receipts/
+│   │   │   ├── app.py      # Lambda function to list all receipts stored in DynamoDB
+│   │   │   └── requirements.txt  # Python dependencies
+│   │
+│   ├── infrastructure/
+│   │   ├── s3_bucket_setup.py    # Script for S3 bucket creation (if not using CloudFormation)
+│   │   ├── dynamodb_setup.py     # Script for setting up the DynamoDB table (if not using CloudFormation)
+│   │   ├── api_gateway_setup.py  # Script to set up API Gateway and link it to Lambda functions (optional)
+│   │   └── cloudformation.yaml   # (Optional) Infrastructure as Code for S3, DynamoDB, API Gateway, Lambda (CloudFormation Template)
+│
 ├── tests/
-│   ├── frontend_tests/
-│   │   └── App.test.js
-│   └── backend_tests/
-│       └── lambda_tests/
-│           └── receipt_processor.test.js
-├── docs/
-│   ├── README.md
-│   ├── API_Documentation.md
-│   └── architecture_diagram.png
-├── .gitignore
-└── README.md
+│   ├── test_upload_function.py   # Unit tests for the upload_receipt Lambda function
+│   ├── test_search_function.py   # Unit tests for the search_receipt Lambda function
+│   └── test_list_function.py     # Unit tests for the list_receipts Lambda function
+│
+└── README.md                     # Instructions for setting up and running the project
