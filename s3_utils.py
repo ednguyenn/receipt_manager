@@ -1,10 +1,27 @@
 import boto3
+import os
+from dotenv import load_dotenv
 
-# Initialize the S3 client
-s3 = boto3.client('s3')
+# Load environment variables from .env file
+load_dotenv()
+
+# Get credentials from environment
+aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+region = os.getenv('AWS_DEFAULT_REGION')
+
+# Initialize S3 client using credentials
+s3 = boto3.client(
+    's3',
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
+    region_name=region
+)
+
+
 
 # The name of your S3 bucket
-BUCKET_NAME = 'your-receipt-manager-bucket'
+BUCKET_NAME = 'my-receipt-manager-bucket'
 
 def upload_to_s3(receipt_id, file):
     """

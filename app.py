@@ -1,35 +1,36 @@
 from flask import Flask, render_template, request, jsonify
 import boto3
-import uuid
+import os
 from s3_utils import upload_to_s3
 from dynamodb_utils import store_receipt_metadata, query_receipts
 from bedrock_utils import interpret_query_with_bedrock
 
+
 app = Flask(__name__)
+
+
 
 # Home page that displays the upload and search interface
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Upload receipt route
 @app.route('/upload', methods=['POST'])
 def upload_receipt():
-    merchant = request.form['merchant']
-    receipt_date = request.form['receipt_date']
-    amount = request.form['amount']
-    
-    # Assume file is uploaded via form
+    # Get the uploaded file (image of the receipt)
     file = request.files['file']
-    receipt_id = str(uuid.uuid4())
     
-    # Upload the file to S3
-    s3_url = upload_to_s3(receipt_id, file)
-    
-    # Store metadata in DynamoDB
-    store_receipt_metadata(receipt_id, merchant, receipt_date, amount, s3_url)
-    
-    return jsonify({"message": "Receipt uploaded successfully!"})
+    # Generate a unique identifier for the receipt (used for the S3 key)
+    receipt_id = os.urandom(16).hex()
+
+    # Upload the receipt image to S3
+    s3_url = upload_to_s3(receipt_id, file)  # Call the S3 utility function
+
+    # Return a response indicating that the upload was successful
+    return jsonify({
+        "message": "Receipt uploaded successfully!",
+        "s3_url": s3_url
+    })
 
 # Search receipt route using Bedrock
 @app.route('/search', methods=['POST'])
