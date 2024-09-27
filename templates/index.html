@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Manager</title>
+</head>
+<body>
+    <h1>Receipt Manager</h1>
+    
+    <!-- Form for uploading a receipt -->
+    <h2>Upload Receipt</h2>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label>Merchant:</label><input type="text" name="merchant" required><br>
+        <label>Date:</label><input type="date" name="receipt_date" required><br>
+        <label>Amount:</label><input type="number" name="amount" required><br>
+        <label>Receipt Image:</label><input type="file" name="file" required><br>
+        <button type="submit">Upload Receipt</button>
+    </form>
+
+    <hr>
+
+    <!-- Form for searching receipts -->
+    <h2>Search Receipts</h2>
+    <form action="/search" method="post">
+        <label>Search Query:</label><input type="text" name="query" required><br>
+        <button type="submit">Search</button>
+    </form>
+
+    <hr>
+
+    <!-- Button to list all receipts -->
+    <h2>List All Receipts</h2>
+    <a href="/list"><button>Show All Receipts</button></a>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Receipts</title>
+</head>
+<body>
+    <h1>All Receipts</h1>
+    
+    {% if receipts %}
+        <ul>
+            {% for receipt in receipts %}
+                <li>
+                    Merchant: {{ receipt['merchant'] }}<br>
+                    Date: {{ receipt['receipt_date'] }}<br>
+                    Amount: ${{ receipt['amount'] }}<br>
+                    <a href="{{ receipt['s3_url'] }}">View Receipt</a><br>
+                    <hr>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No receipts available.</p>
+    {% endif %}
+
+    <a href="/">Back to Home</a>
+</body>
+</html>
