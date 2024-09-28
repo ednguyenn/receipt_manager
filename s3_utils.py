@@ -46,3 +46,26 @@ def upload_to_s3(receipt_id, file):
     except Exception as e:
         print(f"Error uploading to S3: {str(e)}")
         raise
+
+def get_receipt_image_url(receipt_id):
+    """
+    Get the S3 URL for a given receipt ID.
+
+    Args:
+        receipt_id (str): The unique identifier for the receipt.
+    
+    Returns:
+        str: The S3 URL of the receipt image.
+    """
+    # Construct the S3 key for the receipt image
+    s3_key = f"receipts/{receipt_id}.jpg"
+
+    # Generate a presigned URL for accessing the image
+    s3_url = s3.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': BUCKET_NAME, 'Key': s3_key},
+        ExpiresIn=3600  # URL expires in 1 hour
+    )
+    return s3_url
+
+

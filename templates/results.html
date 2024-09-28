@@ -3,27 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results</title>
+    <title>Receipt Search Results</title>
 </head>
 <body>
-    <h1>Search Results</h1>
-    
-    {% if results %}
-        <ul>
-            {% for result in results %}
-                <li>
-                    Merchant: {{ result['merchant'] }}<br>
-                    Date: {{ result['receipt_date'] }}<br>
-                    Amount: ${{ result['amount'] }}<br>
-                    <a href="{{ result['s3_url'] }}">View Receipt</a><br>
-                    <hr>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No receipts found for the search query.</p>
-    {% endif %}
+    <h1>Receipt Search Results</h1>
 
-    <a href="/">Back to Home</a>
+    <!-- Display search results -->
+    {% if results %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Receipt ID</th>
+                    <th>Merchant</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Receipt Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['receipt_id'] }}</td>
+                        <td>{{ result['merchant'] }}</td>
+                        <td>{{ result['receipt_date'] }}</td>
+                        <td>{{ result['amount'] }}</td>
+                        <td>
+                            <!-- Display the receipt image using the S3 URL -->
+                            <img src="{{ result['image_url'] }}" alt="Receipt Image" width="200">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No matching receipts found.</p>
+    {% endif %}
 </body>
 </html>

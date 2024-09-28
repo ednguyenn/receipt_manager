@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 import boto3
 import os
-from s3_utils import upload_to_s3
-from dynamodb_utils import store_receipt_metadata, query_receipts
-from bedrock_utils import interpret_query_with_bedrock
+from s3_utils import upload_to_s3, get_receipt_image_url
+from dynamodb_utils import query_receipts
+from llm_search_utils import interpret_query_with_openai
 
 
 app = Flask(__name__)
@@ -32,21 +32,29 @@ def upload_receipt():
         "s3_url": s3_url
     })
 
-# Search receipt route using Bedrock
 @app.route('/search', methods=['POST'])
 def search_receipt():
+    # Step 1: Get the search query from the user input (e.g., "find me a Starbucks receipt from 5th of July")
     search_query = request.form['query']
+
+    # Step 2: Use OpenAI API to interpret the query and extract structured data (merchant, date, amount)
+    structured_data = interpret_query_with_openai(search_query)
     
-    # Call Amazon Bedrock to interpret the query
-    interpreted_data = interpret_query_with_bedrock(search_query)
-    
-    # Extract merchant and date
-    merchant = interpreted_data.get('merchant')
-    receipt_date = interpreted_data.get('date')
-    
-    # Query DynamoDB for the receipt
-    results = query_receipts(merchant, receipt_date)
-    
+    # Extract the interpreted values
+    merchant = structured_data.get('merchant', '').strip() or None
+    date = structured_data.get('date', '').strip() or None
+    amount = structured_data.get('amount', '').strip() or None
+
+    # Step 3: Query DynamoDB for receipts matching the extracted information
+    results = query_receipts(merchant=merchant, receipt_date=date, amount=amount)
+
+    # Step 4: Retrieve the S3 URLs for the matching receipts
+    for result in results:
+        receipt_id = result['receipt_id']
+        # Generate and add the S3 image URL to the result dictionary
+        result['image_url'] = get_receipt_image_url(receipt_id)
+
+    # Step 5: Render the search results page with the receipt images
     return render_template('results.html', results=results)
 
 # List all receipts
