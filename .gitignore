@@ -1,2 +1,4 @@
 .venv
 .env
+lambda_function.zip
+__pycache__

@@ -1,0 +1,3 @@
+TODOlist
++ refactor lambda function, only save raw text into dynamodb 
++ use llm to match query with dynamodb and retrieve the receipt photo from s3 bucket via receipt_id 
