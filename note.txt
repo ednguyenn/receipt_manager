@@ -1,3 +1,5 @@
 TODOlist
-+ refactor lambda function, only save raw text into dynamodb 
-+ use llm to match query with dynamodb and retrieve the receipt photo from s3 bucket via receipt_id 
++ refactor lambda function, only save raw text + receipt_id into dynamodb 
++ query dynamodb table to match the search data
++ dockerize the Flask application 
++ deploy flask app on ECS and ECR 
