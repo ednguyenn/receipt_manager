@@ -2,3 +2,5 @@
 .env
 lambda_function.zip
 __pycache__
+lambda_package/
+compose.yaml
