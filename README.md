@@ -1,20 +1,20 @@
 Receipt Manager is a flask web application built to showcase AWS expertise using a containerized deployment approach. It enables users to upload, store, and search for receipts using AWS services and natural language queries.
 
-Functionality
+**Functionality**
 
-Upload Receipts: Upload or take a photo of a receipt, which is stored in Amazon S3.
-Data Extraction: Automatically extracts merchant, date, and amount details using AWS Textract.
-Search & Retrieval: Retrieve receipts using natural language queries like "Starbucks receipts in September" with the help of OpenAI’s LLM.
-Receipt Viewing: Displays original receipt images based on search results.
-Tech Stack
-Frontend & Backend: Flask app containerized with Docker and deployed on EC2 using Amazon ECR.
-Storage: Amazon S3 for storing original receipt images.
-Database: Amazon DynamoDB for storing receipt metadata.
-Data Extraction: AWS Textract for extracting text and data from images.
-Authentication: Amazon Cognito.
-LLM Integration: OpenAI API for natural language query interpretation.
+Upload Receipts:   Upload or take a photo of a receipt, which is stored in Amazon S3.
+Data Extraction:   Automatically extracts merchant, date, and amount details using AWS Textract.
+Search & Retrieval:   Retrieve receipts using natural language queries like "Starbucks receipts in September" with the help of OpenAI’s LLM.
+Receipt Viewing:   Displays original receipt images based on search results.
+**Tech Stack**
+Frontend & Backend:   Flask app containerized with Docker and deployed on EC2 using Amazon ECR.
+Storage:   Amazon S3 for storing original receipt images.
+Database:   Amazon DynamoDB for storing receipt metadata.
+Data Extraction:   AWS Textract for extracting text and data from images.
+Authentication:   Amazon Cognito.
+LLM Integration:   OpenAI API for natural language query interpretation.
 
-Deployment
+**Deployment**
 Dockerize the Flask app and push the image to Amazon ECR.
 Deploy the Docker container on Fargate.
 Use Amazon Cognito for user authentication.
