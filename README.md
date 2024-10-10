@@ -6,6 +6,7 @@ Upload Receipts:   Upload or take a photo of a receipt, which is stored in Amazo
 Data Extraction:   Automatically extracts merchant, date, and amount details using AWS Textract.
 Search & Retrieval:   Retrieve receipts using natural language queries like "Starbucks receipts in September" with the help of OpenAI’s LLM.
 Receipt Viewing:   Displays original receipt images based on search results.
+
 **Tech Stack**
 Frontend & Backend:   Flask app containerized with Docker and deployed on EC2 using Amazon ECR.
 Storage:   Amazon S3 for storing original receipt images.
