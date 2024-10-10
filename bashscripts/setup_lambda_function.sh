@@ -10,24 +10,6 @@ LAMBDA_RUNTIME="python3.11"                          # Lambda runtime version
 LAMBDA_REGION="ap-southeast-2"                       # AWS region
 ZIP_FILE_NAME="lambda_function.zip"                  # Name of the deployment ZIP file
 PACKAGE_DIR="lambda_package"                         # Directory to hold the Lambda package files
-ENV_FILE=".env"                                      # Path to .env file
-
-# Read the OpenAI API key from .env file
-if [ -f "$ENV_FILE" ]; then
-  echo "Loading environment variables from $ENV_FILE..."
-  source $ENV_FILE
-else
-  echo "Error: .env file not found. Please create a .env file with your OpenAI API key."
-  exit 1
-fi
-
-# Check if the OpenAI API key is set
-if [ -z "$OPENAI_API_KEY" ]; then
-  echo "Error: OPENAI_API_KEY is not set in .env file."
-  exit 1
-else
-  echo "OpenAI API key found: $OPENAI_API_KEY"
-fi
 
 # Step 1: Create IAM Role for Lambda (if it doesn't exist)
 echo "Creating IAM Role for Lambda function..."
@@ -73,13 +55,12 @@ aws iam attach-role-policy --role-name $ROLE_NAME --policy-arn arn:aws:iam::aws:
 
 # Step 3: Wait for the IAM role to be ready
 echo "Waiting for IAM role to be ready..."
-sleep 20  # Increased wait time to 20 seconds to ensure IAM role is fully created and policies are attached
+sleep 20  
 
 # Step 4: Create Lambda Deployment Package
 echo "Creating Lambda deployment package..."
 mkdir -p $PACKAGE_DIR
 cp lambda_function.py $PACKAGE_DIR/
-pip install openai -t $PACKAGE_DIR/
 cd $PACKAGE_DIR
 zip -r ../$ZIP_FILE_NAME .
 cd ..
@@ -95,7 +76,7 @@ CREATE_RESPONSE=$(aws lambda create-function \
   --timeout 120 \
   --memory-size 512 \
   --region $LAMBDA_REGION \
-  --environment Variables="{DYNAMODB_TABLE=$DYNAMODB_TABLE,S3_BUCKET_NAME=$S3_BUCKET_NAME,OPENAI_API_KEY=$OPENAI_API_KEY}" \
+  --environment Variables="{DYNAMODB_TABLE=$DYNAMODB_TABLE,S3_BUCKET_NAME=$S3_BUCKET_NAME}" \
   2>&1)
 
 # Check if the Lambda function was created successfully
@@ -142,8 +123,5 @@ aws s3api put-bucket-notification-configuration \
         }
       ]
     }' 2>/dev/null
-
-# Step 7: Cleanup (optional) - Remove the lambda_package directory
-rm -rf $PACKAGE_DIR
 
 echo "Deployment completed successfully."

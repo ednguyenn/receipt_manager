@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import boto3
 import os
 from s3_utils import upload_to_s3, get_receipt_image_url
-from dynamodb_utils import query_receipts
-from llm_search_utils import interpret_query_with_openai
+from dynamodb_utils import query_receipts_by_keywords, query_receipts
+from llm_search_utils import extract_keywords_with_openai
 
 
 app = Flask(__name__)
@@ -34,19 +34,18 @@ def upload_receipt():
 
 @app.route('/search', methods=['POST'])
 def search_receipt():
-    # Step 1: Get the search query from the user input (e.g., "find me a Starbucks receipt from 5th of July")
+    # Step 1: Get the search query from the user input
     search_query = request.form['query']
 
-    # Step 2: Use OpenAI API to interpret the query and extract structured data (merchant, date, amount)
-    structured_data = interpret_query_with_openai(search_query)
-    
-    # Extract the interpreted values
-    merchant = structured_data.get('merchant', '').strip() or None
-    date = structured_data.get('date', '').strip() or None
-    amount = structured_data.get('amount', '').strip() or None
+    # Step 2: Use OpenAI API to extract keywords from the query
+    keywords = extract_keywords_with_openai(search_query)
 
-    # Step 3: Query DynamoDB for receipts matching the extracted information
-    results = query_receipts(merchant=merchant, receipt_date=date, amount=amount)
+    if not keywords:
+        # If no keywords extracted, return an error message or empty results
+        return render_template('results.html', results=[], message="No keywords found in the query.")
+
+    # Step 3: Query DynamoDB for receipts containing the keywords
+    results = query_receipts_by_keywords(keywords)
 
     # Step 4: Retrieve the S3 URLs for the matching receipts
     for result in results:
@@ -57,11 +56,22 @@ def search_receipt():
     # Step 5: Render the search results page with the receipt images
     return render_template('results.html', results=results)
 
+
+
 # List all receipts
 @app.route('/list', methods=['GET'])
 def list_receipts():
     # Query DynamoDB to list all receipts
     receipts = query_receipts()
+
+    # Optionally, process receipts to include image URLs
+    for receipt in receipts:
+        receipt_id = receipt.get('receipt_id')
+        if receipt_id:
+            receipt['image_url'] = get_receipt_image_url(receipt_id)
+        else:
+            receipt['image_url'] = None  # Or handle accordingly
+
     return render_template('list.html', receipts=receipts)
 
 if __name__ == '__main__':

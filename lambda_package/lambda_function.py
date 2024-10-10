@@ -8,7 +8,6 @@ table = dynamodb.Table('Receipts')
 
 def lambda_handler(event, context):
     try:
-        REGION = 'ap-southeast-2'
         # Step 1: Get the bucket and object key from the S3 event
         bucket_name = event['Records'][0]['s3']['bucket']['name']
         object_key = event['Records'][0]['s3']['object']['key']
@@ -46,7 +45,7 @@ def lambda_handler(event, context):
         item = {
             'receipt_id': receipt_id,
             'raw_text': raw_text,  # Store the raw text extracted from the receipt
-            's3_url': f"https://{bucket_name}.s3.{REGION}.amazonaws.com/{object_key}"
+            's3_url': f"https://{bucket_name}.s3.amazonaws.com/{object_key}"
         }
         print(f"Storing item in DynamoDB: {item}")
 
@@ -73,4 +72,4 @@ def extract_raw_text(textract_response):
     for block in textract_response['Blocks']:
         if block['BlockType'] == 'LINE':
             raw_text += block['Text'] + "\n"
-    return raw_text.strip().lower()  # Remove leading/trailing whitespace
+    return raw_text.strip()  # Remove leading/trailing whitespace

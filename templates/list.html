@@ -3,27 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Receipts</title>
+    <title>Receipt Manager - List of Receipts</title>
+    <!-- Bootstrap CSS for Styling (optional) -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>All Receipts</h1>
-    
-    {% if receipts %}
-        <ul>
-            {% for receipt in receipts %}
-                <li>
-                    Merchant: {{ receipt['merchant'] }}<br>
-                    Date: {{ receipt['receipt_date'] }}<br>
-                    Amount: ${{ receipt['amount'] }}<br>
-                    <a href="{{ receipt['s3_url'] }}">View Receipt</a><br>
-                    <hr>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No receipts available.</p>
-    {% endif %}
+    <div class="container mt-5">
+        <h1 class="text-center">List of Receipts</h1>
+        <!-- Display a message if no receipts are available -->
+        {% if receipts %}
+            <table class="table table-bordered table-striped mt-4">
+                <thead>
+                    <tr>
+                        <th>Receipt ID</th>
+                        <th>Details</th>
+                        <th>Receipt Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Loop through each receipt and display its details -->
+                    {% for receipt in receipts %}
+                        <tr>
+                            <td>{{ receipt.receipt_id }}</td>
+                            <td>
+                                <strong>Raw Text:</strong><br>
+                                <pre>{{ receipt.raw_text }}</pre>
+                            </td>
+                            <td>
+                                <!-- Display the receipt image if available -->
+                                {% if receipt.image_url %}
+                                    <a href="{{ receipt.image_url }}" target="_blank">
+                                        <img src="{{ receipt.image_url }}" alt="Receipt Image" style="width: 200px;">
+                                    </a>
+                                {% else %}
+                                    <span>No Image Available</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-warning text-center mt-4">
+                No receipts available to display.
+            </div>
+        {% endif %}
+    </div>
 
-    <a href="/">Back to Home</a>
+    <!-- Bootstrap JS and dependencies (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

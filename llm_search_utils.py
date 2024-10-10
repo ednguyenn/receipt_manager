@@ -6,46 +6,55 @@ import json
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def interpret_query_with_openai(query):
+def extract_keywords_with_openai(query):
     """
-    Use the OpenAI API to interpret a natural language query using the chat model.
+    Use OpenAI to extract keywords from the user's natural language query.
 
     Args:
-        query (str): The user's natural language query.
+        query (str): The user's search query.
 
     Returns:
-        dict: Interpreted structured data (e.g., merchant, date, amount).
+        list: A list of keywords extracted from the query.
     """
-    # Create a structured message to guide the LLM in extracting information from the query
     messages = [
         {
             "role": "system",
-            "content": "You are a data extraction system that extracts relevant information from a natural language query about receipts."
+            "content": "You are a helpful assistant that extracts keywords from user queries to search receipts."
         },
         {
             "role": "user",
-            "content": f"Extract the merchant, date, and amount from this query: '{query}'. Return the result in this JSON format:\n{{\"merchant\": \"\", \"date\": \"\", \"amount\": \"\"}}"
+            "content": f"Extract the main keywords from the following query: \"{query}\". "
+                       f"Please return the keywords as a JSON array of strings, like this: [\"keyword1\", \"keyword2\", ...]"
         }
     ]
 
     try:
-        # Call OpenAI's v1/chat/completions endpoint with the chat model
+        # Call OpenAI's ChatCompletion API
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Use "gpt-3.5-turbo" or "gpt-4" for chat-based models
+            model="gpt-3.5-turbo",  # Use the appropriate model
             messages=messages,
             temperature=0.0
         )
 
-        # Extract the response content and convert it to a dictionary
-        extracted_data = response['choices'][0]['message']['content'].strip()
-        structured_data = json.loads(extracted_data)
+        # Extract and print the response content for debugging
+        raw_response = response['choices'][0]['message']['content'].strip().lower()
+        print(f"OpenAI Raw Response: {raw_response}")  # Debugging print
 
-        return structured_data
+        # Load the response as a JSON array
+        keywords = json.loads(raw_response)
 
+        # Ensure that the result is a list of strings
+        if isinstance(keywords, list) and all(isinstance(k, str) for k in keywords):
+            keywords = [keyword.lower() for keyword in keywords]
+            return keywords
+        else:
+            print("Error: OpenAI response is not a list of strings.")
+            return []
+
+    except json.JSONDecodeError:
+        print("Error: OpenAI response is not a valid JSON. Check the response format.")
+        print(f"Response Content: {raw_response}")  # Print the problematic response
+        return []
     except Exception as e:
-        print(f"Error interpreting query with OpenAI: {str(e)}")
-        return {
-            "merchant": "",
-            "date": "",
-            "amount": ""
-        }
+        print(f"Error calling OpenAI API: {str(e)}")
+        return []
