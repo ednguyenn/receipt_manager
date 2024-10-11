@@ -1,4 +1,10 @@
-211125652748.dkr.ecr.ap-southeast-2.amazonaws.com/receipt_manager-server         ECR 
+#How to Setup AWS ECS Fargate with a Load Balancer | Step by Step
+https://www.youtube.com/watch?v=o7s-eigrMAI
 
-
-
+build and push image to ECR - save the URI 
+create ECS cluster -> create load balancer listen to port 80
+create target group (select IP instead of instance for FARGATE deployment) - listen to container expose port
+security group should allow port 80 and all traffic will go to specific security group ID with fargate services
+create task definition with appropriate permissions (Textract, DynamoDB, S3) for Taskrole
+create service to host task definition and deploy. 
+DNS is in ALB detail
