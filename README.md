@@ -1,4 +1,4 @@
-Receipt Manager is a flask web application built to showcase AWS expertise using a containerized deployment approach. It enables users to upload, store, and search for receipts using AWS services and natural language queries.
+Receipt Manager is a Flask web application designed as a showcase deployment using Amazon ECS and containerization. This app demonstrates expertise in AWS services and cloud architecture through a seamless integration of microservices for receipt management.
 
 **Functionality**
 
