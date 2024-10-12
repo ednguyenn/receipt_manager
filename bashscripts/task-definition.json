@@ -1,0 +1,49 @@
+{
+    "family": "ecs-task-receipt-manager",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+      {
+        "name": "receipt-manager",
+        "image": "211125652748.dkr.ecr.ap-southeast-2.amazonaws.com/receipt_manager-server:latest",
+        "cpu": 256,
+        "memory": 512,
+        "essential": true,
+        "portMappings": [
+          {
+            "containerPort": 5000,
+            "protocol": "tcp"
+          }
+        ],
+        "secrets": [
+          {
+            "name": "OPENAI_API_KEY",
+            "valueFrom": "arn:aws:secretsmanager:ap-southeast-2:211125652748:secret:OPENAI_API_KEY"
+          },
+          {
+            "name": "AWS_ACCESS_KEY_ID",
+            "valueFrom": "arn:aws:secretsmanager:ap-southeast-2:211125652748:secret:AWS_ACCESS_KEY_ID"
+          },
+          {
+            "name": "AWS_SECRET_ACCESS_KEY",
+            "valueFrom": "arn:aws:secretsmanager:ap-southeast-2:211125652748:secret:AWS_SECRET_ACCESS_KEY"
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/updated-production-flask-receipt",
+            "awslogs-region": "ap-southeast-2",
+            "awslogs-stream-prefix": "ecs"
+          }
+        }
+      }
+    ],
+    "requiresCompatibilities": [
+      "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072",
+    "executionRoleArn": "arn:aws:iam::211125652748:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::211125652748:role/ECSTaskExecution-role"
+  }
+  

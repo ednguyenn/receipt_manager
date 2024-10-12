@@ -8,3 +8,13 @@ security group should allow port 80 and all traffic will go to specific security
 create task definition with appropriate permissions (Textract, DynamoDB, S3) for Taskrole - add environment variables into task definition json 
 create service to host task definition and deploy. 
 DNS is in ALB detail
+
+
+Fully automate deployment run:
+./bashscripts/deploy.sh
+This will follow the steps in sequence:
+
+1. Compose up build image and push to ECR.
+2. Store or update secrets in AWS Secrets Manager.
+3. Register the ECS Task Definition.
+4. Deploy the ECS Service and ALB using CloudFormation.

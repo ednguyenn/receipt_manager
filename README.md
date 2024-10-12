@@ -16,6 +16,7 @@ Authentication:   Amazon Cognito.
 LLM Integration:   OpenAI API for natural language query interpretation.
 
 **Deployment**
+
 Dockerize the Flask app and push the image to Amazon ECR.
 Deploy the Docker container on Fargate.
 Use Amazon Cognito for user authentication.
@@ -28,8 +29,15 @@ Configure the Flask app to interact with AWS services like S3, DynamoDB, and Tex
 │   ├── create_dynamodb_table.sh
 │   ├── create_ECS_cluster.sh
 │   ├── create_s3_bucket.sh
+│   ├── deploy.sh
 │   ├── push_to_ECR.sh
-│   └── setup_lambda_function.sh
+│   ├── register_task_definition.sh
+│   ├── setup_infrastructure.sh
+│   ├── setup_lambda_function.sh
+│   ├── store_secrets.sh
+│   └── task-definition.json
+├── CloudFormation
+│   └── ECS-deployment-template.json
 ├── compose.yaml
 ├── Dockerfile
 ├── lambda_function.py
@@ -48,4 +56,5 @@ Configure the Flask app to interact with AWS services like S3, DynamoDB, and Tex
 │   ├── conftest.py
 │   └── utils_test.py
 └── utils.py
+
 ```

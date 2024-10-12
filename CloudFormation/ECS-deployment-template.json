@@ -1,102 +1,110 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "The template used to create an ECS Service from the ECS Console.",
-    "Parameters": {
-      "ECSClusterName": {
-        "Type": "String",
-        "Default": "my-first-cluster"
-      },
-      "ECSServiceName": {
-        "Type": "String",
-        "Default": "webapp"
-      },
-      "SecurityGroupIDs": {
-        "Type": "CommaDelimitedList",
-        "Default": "sg-0b7f0f71f643e0221"
-      },
-      "SubnetIDs": {
-        "Type": "CommaDelimitedList",
-        "Default": "subnet-090e88f0d541ac21d,subnet-01bb6a97d29ecf083,subnet-03b7be7c8ddb57f0e"
-      },
-      "VpcID": {
-        "Type": "String",
-        "Default": "vpc-0f501f8639f96856f"
-      },
-      "LoadBalancerName": {
-        "Type": "String",
-        "Default": "alb-receipt-manager"
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The template to create an ECS Service with ALB and required networking.",
+  "Parameters": {
+    "ECSClusterName": {
+      "Type": "String",
+      "Default": "my-first-cluster"
+    },
+    "ECSServiceName": {
+      "Type": "String",
+      "Default": "webapp"
+    },
+    "VpcID": {
+      "Type": "String",
+      "Description": "VPC ID for the ECS Service and Load Balancer"
+    },
+    "SubnetIDs": {
+      "Type": "CommaDelimitedList",
+      "Description": "Subnets for the ECS Service and Load Balancer"
+    }
+  },
+  "Resources": {
+    "ECSLoadBalancerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": { "Ref": "VpcID" },
+        "GroupDescription": "Security Group for ALB",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 80,
+            "ToPort": 80,
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
       }
     },
-    "Resources": {
-      "ECSService": {
-        "Type": "AWS::ECS::Service",
-        "Properties": {
-          "Cluster": "my-first-cluster",
-          "CapacityProviderStrategy": [
-            {
-              "CapacityProvider": "FARGATE",
-              "Base": 0,
-              "Weight": 1
-            }
-          ],
-          "TaskDefinition": "arn:aws:ecs:ap-southeast-2:211125652748:task-definition/ecs-task-receipt-manager:4",
-          "ServiceName": "webapp",
-          "SchedulingStrategy": "REPLICA",
-          "DesiredCount": 1,
-          "LoadBalancers": [
-            {
-              "ContainerName": "receipt-manager",
-              "ContainerPort": 5000,
-              "LoadBalancerName": {
-                "Ref": "AWS::NoValue"
-              },
-              "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-southeast-2:211125652748:targetgroup/receipt-manager/a87759f4cf8edc94"
-            }
-          ],
-          "HealthCheckGracePeriodSeconds": "0",
-          "NetworkConfiguration": {
-            "AwsvpcConfiguration": {
-              "AssignPublicIp": "ENABLED",
-              "SecurityGroups": {
-                "Ref": "SecurityGroupIDs"
-              },
-              "Subnets": {
-                "Ref": "SubnetIDs"
-              }
-            }
-          },
-          "PlatformVersion": "LATEST",
-          "DeploymentConfiguration": {
-            "MaximumPercent": 200,
-            "MinimumHealthyPercent": 100,
-            "DeploymentCircuitBreaker": {
-              "Enable": true,
-              "Rollback": true
-            }
-          },
-          "DeploymentController": {
-            "Type": "ECS"
-          },
-          "ServiceConnectConfiguration": {
-            "Enabled": false
-          },
-          "Tags": [],
-          "EnableECSManagedTags": true
+    "ApplicationLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+        "Subnets": { "Ref": "SubnetIDs" },
+        "SecurityGroups": [{ "Ref": "ECSLoadBalancerSecurityGroup" }],
+        "Scheme": "internet-facing"
+      }
+    },
+    "ALBTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "VpcId": { "Ref": "VpcID" },
+        "Port": 5000,
+        "Protocol": "HTTP",
+        "TargetType": "ip",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckPath": "/",
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 3,
+        "UnhealthyThresholdCount": 3,
+        "Matcher": {
+          "HttpCode": "200"
         }
       }
     },
-    "Outputs": {
-      "ClusterName": {
-        "Description": "The cluster used to create the service.",
-        "Value": {
-          "Ref": "ECSClusterName"
-        }
-      },
-      "ECSService": {
-        "Description": "The created service.",
-        "Value": {
-          "Ref": "ECSService"
-        }
+    "ALBListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
+        "Port": 80,
+        "Protocol": "HTTP",
+        "DefaultActions": [
+          {
+            "Type": "forward",
+            "TargetGroupArn": { "Ref": "ALBTargetGroup" }
+          }
+        ]
+      }
+    },
+    "ECSService": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {
+        "Cluster": { "Ref": "ECSClusterName" },
+        "ServiceName": { "Ref": "ECSServiceName" },
+        "TaskDefinition": "arn:aws:ecs:ap-southeast-2:211125652748:task-definition/ecs-task-receipt-manager:4",
+        "DesiredCount": 1,
+        "LoadBalancers": [
+          {
+            "ContainerName": "receipt-manager",
+            "ContainerPort": 5000,
+            "TargetGroupArn": { "Ref": "ALBTargetGroup" }
+          }
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "ENABLED",
+            "SecurityGroups": [{ "Ref": "ECSLoadBalancerSecurityGroup" }],
+            "Subnets": { "Ref": "SubnetIDs" }
+          }
+        },
+        "PlatformVersion": "LATEST",
+        "LaunchType": "FARGATE"
       }
     }
+  },
+  "Outputs": {
+    "LoadBalancerDNS": {
+      "Description": "The DNS name of the load balancer",
+      "Value": { "Fn::GetAtt": ["ApplicationLoadBalancer", "DNSName"] }
+    }
   }
+}
