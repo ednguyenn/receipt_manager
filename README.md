@@ -3,7 +3,7 @@ Receipt Manager is a Flask web application designed as a showcase deployment usi
 **Functionality**
 
 Upload Receipts:   Upload or take a photo of a receipt, which is stored in Amazon S3.
-Data Extraction:   Automatically extracts merchant, date, and amount details using AWS Textract.
+Data Extraction:   Automatically extracts raw data using AWS Textract.
 Search & Retrieval:   Retrieve receipts using natural language queries like "Starbucks receipts in September" with the help of OpenAI’s LLM.
 Receipt Viewing:   Displays original receipt images based on search results.
 
@@ -21,7 +21,7 @@ Deploy the Docker container on Fargate.
 Use Amazon Cognito for user authentication.
 Configure the Flask app to interact with AWS services like S3, DynamoDB, and Textract.
 ```
-.
+
 .
 ├── app.py
 ├── bashscripts
@@ -32,21 +32,20 @@ Configure the Flask app to interact with AWS services like S3, DynamoDB, and Tex
 │   └── setup_lambda_function.sh
 ├── compose.yaml
 ├── Dockerfile
-├── dynamodb_utils.py
 ├── lambda_function.py
 ├── lambda_function.zip
 ├── lambda_package
 │   └── lambda_function.py
-├── llm_search_utils.py
 ├── note.txt
 ├── README.Docker.md
 ├── README.md
 ├── requirements.txt
-├── s3_utils.py
 ├── templates
 │   ├── index.html
 │   ├── list.html
 │   └── results.html
-└── tests
-
+├── tests
+│   ├── conftest.py
+│   └── utils_test.py
+└── utils.py
 ```
