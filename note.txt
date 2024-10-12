@@ -5,6 +5,6 @@ build and push image to ECR - save the URI
 create ECS cluster -> create load balancer listen to port 80
 create target group (select IP instead of instance for FARGATE deployment) - listen to container expose port
 security group should allow port 80 and all traffic will go to specific security group ID with fargate services
-create task definition with appropriate permissions (Textract, DynamoDB, S3) for Taskrole
+create task definition with appropriate permissions (Textract, DynamoDB, S3) for Taskrole - add environment variables into task definition json 
 create service to host task definition and deploy. 
 DNS is in ALB detail

@@ -9,12 +9,12 @@ table = dynamodb.Table('Receipts')
 def lambda_handler(event, context):
     try:
         REGION = 'ap-southeast-2'
-        # Step 1: Get the bucket and object key from the S3 event
+        # Get the bucket and object key from the S3 event
         bucket_name = event['Records'][0]['s3']['bucket']['name']
         object_key = event['Records'][0]['s3']['object']['key']
         print(f"Processing file from bucket: {bucket_name}, key: {object_key}")
 
-        # Step 2: Call Textract to extract text from the uploaded receipt image
+        # Call Textract to extract text from the uploaded receipt image
         textract_response = textract.analyze_document(
             Document={'S3Object': {'Bucket': bucket_name, 'Name': object_key}},
             FeatureTypes=["FORMS", "TABLES"]
@@ -29,7 +29,7 @@ def lambda_handler(event, context):
                 'body': json.dumps('Error: Textract did not return any text blocks.')
             }
 
-        # Step 3: Extract raw text from the Textract response
+        # Extract raw text from the Textract response
         raw_text = extract_raw_text(textract_response)
         print(f"Extracted raw text: {raw_text}")
 
@@ -41,7 +41,7 @@ def lambda_handler(event, context):
                 'body': json.dumps('Error: No text found in Textract response.')
             }
 
-        # Step 4: Create receipt metadata and store it in DynamoDB
+        #Create receipt metadata and store it in DynamoDB
         receipt_id = object_key.split('/')[-1].split('.')[0]  # Derive receipt ID from S3 object key
         item = {
             'receipt_id': receipt_id,

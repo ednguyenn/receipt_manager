@@ -1,13 +1,8 @@
 from flask import Flask, render_template, request, jsonify
-import boto3
 import os
-from s3_utils import upload_to_s3, get_receipt_image_url
-from dynamodb_utils import query_receipts_by_keywords, query_receipts
-from llm_search_utils import extract_keywords_with_openai
-
+from utils import *
 
 app = Flask(__name__)
-
 
 
 # Home page that displays the upload and search interface
@@ -34,26 +29,26 @@ def upload_receipt():
 
 @app.route('/search', methods=['POST'])
 def search_receipt():
-    # Step 1: Get the search query from the user input
+    #Get the search query from the user input
     search_query = request.form['query']
 
-    # Step 2: Use OpenAI API to extract keywords from the query
+    #Use OpenAI API to extract keywords from the query
     keywords = extract_keywords_with_openai(search_query)
 
     if not keywords:
         # If no keywords extracted, return an error message or empty results
         return render_template('results.html', results=[], message="No keywords found in the query.")
 
-    # Step 3: Query DynamoDB for receipts containing the keywords
+    #Query DynamoDB for receipts containing the keywords
     results = query_receipts_by_keywords(keywords)
 
-    # Step 4: Retrieve the S3 URLs for the matching receipts
+    #Retrieve the S3 URLs for the matching receipts
     for result in results:
         receipt_id = result['receipt_id']
         # Generate and add the S3 image URL to the result dictionary
         result['image_url'] = get_receipt_image_url(receipt_id)
 
-    # Step 5: Render the search results page with the receipt images
+    #Render the search results page with the receipt images
     return render_template('results.html', results=results)
 
 
@@ -64,7 +59,7 @@ def list_receipts():
     # Query DynamoDB to list all receipts
     receipts = query_receipts()
 
-    # Optionally, process receipts to include image URLs
+    #process receipts to include image URLs
     for receipt in receipts:
         receipt_id = receipt.get('receipt_id')
         if receipt_id:

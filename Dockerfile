@@ -7,7 +7,7 @@ FROM python:${PYTHON_VERSION}-slim as base
 # Prevents Python from writing pyc files and sets unbuffered mode
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV FLASK_ENV=production
+#ENV FLASK_ENV=production --- for deployment purpose
 
 # Set the working directory inside the container
 WORKDIR /app
